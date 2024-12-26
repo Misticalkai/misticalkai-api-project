@@ -19,7 +19,7 @@ const cache = new NodeCache({ stdTTL: 20, checkperiod: 25 }); // TTL set to 20 s
 
 // Create a rate limiter that allows 100 requests per 1 minute
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute
+    windowMs: 1 * 60 * 1000, // 1 minute (This is the correct value you wanted, not 15 minutes)
     max: 100, // Limit each IP to 100 requests per windowMs
     message: 'Too many requests, please try again later.'
 });
@@ -82,6 +82,7 @@ app.get('/youtube/live-sub-count', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
+
 
 
 
