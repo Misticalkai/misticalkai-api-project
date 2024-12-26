@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Subscriber Count</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: white;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            font-size: 36px;
+        }
+
+        #subscriber-count {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Live Subscriber Count</h1>
+    <p id="subscriber-count">Loading...</p>
+
+    <script>
+        // Fetch live subscriber count from the API
+        async function fetchSubscriberCount() {
+            const response = await fetch('/live-subscriber-count');
+            const data = await response.json();
+            document.getElementById('subscriber-count').textContent = `Subscriber Count: ${data.subscriberCount}`;
+        }
+
+        // Fetch the count when the page loads
+        fetchSubscriberCount();
+        
+        // Optionally, you can set an interval to update the count every 30 seconds
+        setInterval(fetchSubscriberCount, 30000);  // Update every 30 seconds
+    </script>
+</body>
+</html>
