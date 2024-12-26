@@ -18,7 +18,7 @@ const cache = new NodeCache({ stdTTL: 300, checkperiod: 320 });
 
 // Create a rate limiter that allows 100 requests per 15 minutes
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 1 * 60 * 1000, // 15 minutes
     max: 100, // Limit each IP to 100 requests per windowMs
     message: 'Too many requests, please try again later.'
 });
