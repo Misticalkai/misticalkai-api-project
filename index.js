@@ -71,7 +71,7 @@ async function getLiveSubscriberCount(forceRefresh = false) {
 app.use(express.static('public'));
 
 // Define a route that returns live subscriber count in JSON format
-app.get('/v1/youtube/live-sub-count', async (req, res) => {
+app.get('/v1/stats/youtube/live-sub-count', async (req, res) => {
     // Check for the 'forceRefresh' query parameter in the URL
     const forceRefresh = req.query.forceRefresh === 'true';
     const subscriberCount = await getLiveSubscriberCount(forceRefresh);
