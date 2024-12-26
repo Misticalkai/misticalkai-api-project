@@ -8,7 +8,7 @@
   ],
   "routes": [
     {
-      "src": "/youtube/live-sub-count",
+      "src": "/v1/youtube/live-sub-count",
       "dest": "/index.js"
     }
   ]
