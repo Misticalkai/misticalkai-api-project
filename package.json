@@ -8,10 +8,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2"
-  }
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "node-cache": "^5.1.2"
+  },
+  "devDependencies": {},
+  "description": ""
 }
