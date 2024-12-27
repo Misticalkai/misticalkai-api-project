@@ -26,9 +26,9 @@ app.use(bodyParser.json());
 
 // Set up AWS SDK for Cloudflare R2
 const s3 = new AWS.S3({
-  endpoint: process.env.CLOUDFLARE_R2_ENDPOINT,  // R2 endpoint
-  accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID, // R2 Access Key
-  secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY, // R2 Secret Key
+  endpoint: process.env.R2_ENDPOINT_URL,  // Use the R2 endpoint from .env
+  accessKeyId: process.env.R2_ACCESS_KEY_ID, // R2 Access Key from .env
+  secretAccessKey: process.env.R2_SECRET_ACCESS_KEY, // R2 Secret Key from .env
   region: 'auto', // Region for R2
   signatureVersion: 'v4',
 });
@@ -47,7 +47,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'fan-art-submissions-storage',  // Correct bucket name here
+    bucket: 'fan-art-submissions-storage',  // Correct bucket name here (fan-art-submissions-storage)
     acl: 'public-read',  // Set the access control to public read
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: (req, file, cb) => {
@@ -60,7 +60,7 @@ const upload = multer({
 
 // Set up PostgreSQL client
 const client = new Client({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL, // Use DATABASE_URL from .env
 });
 
 client.connect()
@@ -88,8 +88,10 @@ app.post('/v1/user/view-form/submit-fan-mail', upload.single('fanArt'), async (r
   }
 });
 
-// Start the Express server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Start the Express server (For local testing)
+// const PORT = process.env.PORT || 3000;
+// app.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
+
+module.exports = app; // Export the app for use in other files (like server.js for Vercel)
