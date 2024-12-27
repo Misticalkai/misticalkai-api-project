@@ -15,7 +15,7 @@ const app = express();
 // CORS configuration
 const corsOptions = {
   origin: 'https://misticalkai.com', // Allow only requests from this domain
-  methods: ['GET', 'POST'],         // Allow GET and POST requests
+  methods: ['POST'],                // Allow only POST requests
   allowedHeaders: ['Content-Type'],  // Allow only the content-type header
 };
 
@@ -50,6 +50,9 @@ app.post('/v1/user/view-form/submit-fan-mail', upload.single('fanArt'), async (r
   try {
     const { name, email, message } = req.body;
     const file = req.file ? req.file.path : null;
+
+    // Log the submission data (for debugging)
+    console.log('Received fan submission:', { name, email, message, file });
 
     // Insert fan submission into the PostgreSQL database
     const query = 'INSERT INTO fan_submissions(name, email, message, file) VALUES($1, $2, $3, $4) RETURNING *';
