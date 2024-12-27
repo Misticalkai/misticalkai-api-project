@@ -8,8 +8,16 @@
   ],
   "routes": [
     {
-      "src": "/youtube/live-sub-count",
-      "dest": "/index.js"
+      "src": "/v1/user/view-form/submit-fan-mail",
+      "dest": "fan-submissions/user/fan-submissions-logic-index.js"
+    },
+    {
+      "src": "/v1/admin/view-form/fan-submissions",
+      "dest": "fan-submissions/admin/fan-submissions-admin-logic-index.js"
+    },
+    {
+      "src": "/v1/stats/youtube/live-sub-count",
+      "dest": "stats/youtube/stats-logic-index.js"
     }
   ]
 }
