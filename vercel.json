@@ -2,7 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "index.js",
+      "src": "stats/youtube/stats-logic-index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "fan-submissions/user/fan-submissions-logic-index.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "fan-submissions/admin/fan-submissions-admin-logic-index.js",
       "use": "@vercel/node"
     }
   ],
@@ -21,4 +29,5 @@
     }
   ]
 }
+
 
