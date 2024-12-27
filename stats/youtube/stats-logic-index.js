@@ -3,23 +3,25 @@ require('dotenv').config();
 
 // Import necessary libraries
 const axios = require('axios');
-const express = require('express'); // Import Express
-const NodeCache = require('node-cache'); // Import node-cache for caching
-const rateLimit = require('express-rate-limit'); // Import rate limiter
-const cors = require('cors'); // Import CORS middleware
-const app = express(); // Initialize Express app
-const port = 3000; // Define the port to run the server on
+const express = require('express');
+const NodeCache = require('node-cache');
+const rateLimit = require('express-rate-limit');
+const cors = require('cors');
+const { withAnalytics } = require('@vercel/analytics'); // Import Vercel Analytics
+
+const app = express();
+const port = 3000;
 
 // YouTube Channel ID and API Key
-const channelId = 'UC_sAYoFHtdQxA7T0GqG6dFg';  // Replace with your YouTube Channel ID
-const apiKey = process.env.YOUTUBE_API_KEY;  // API key loaded from .env file
+const channelId = 'UC_sAYoFHtdQxA7T0GqG6dFg'; // Replace with your YouTube Channel ID
+const apiKey = process.env.YOUTUBE_API_KEY; // API key loaded from .env file
 
 // Create a cache instance with a default TTL of 20 seconds
 const cache = new NodeCache({ stdTTL: 20, checkperiod: 25 }); // TTL set to 20 seconds
 
 // Create a rate limiter that allows 100 requests per 1 minute
 const limiter = rateLimit({
-    windowMs: 1 * 60 * 1000, // 1 minute (This is the correct value you wanted, not 15 minutes)
+    windowMs: 1 * 60 * 1000, // 1 minute
     max: 100, // Limit each IP to 100 requests per windowMs
     message: 'Too many requests, please try again later.'
 });
@@ -46,7 +48,7 @@ async function getLiveSubscriberCount(forceRefresh = false) {
     }
 
     try {
-        // If not in cache or forced refresh, fetch from YouTube API
+        // Fetch from YouTube API if not in cache or forced refresh
         const response = await axios.get('https://www.googleapis.com/youtube/v3/channels', {
             params: {
                 part: 'statistics',
@@ -71,20 +73,18 @@ async function getLiveSubscriberCount(forceRefresh = false) {
 app.use(express.static('public'));
 
 // Define a route that returns live subscriber count in JSON format
-app.get('/v1/stats/youtube/live-sub-count', async (req, res) => {
-    // Check for the 'forceRefresh' query parameter in the URL
-    const forceRefresh = req.query.forceRefresh === 'true';
+app.get('/v1/stats/youtube/live-sub-count', withAnalytics(async (req, res) => {
+    const forceRefresh = req.query.forceRefresh === 'true'; // Check for the 'forceRefresh' query parameter
     const subscriberCount = await getLiveSubscriberCount(forceRefresh);
-    res.json({ subscriberCount }); // Send the subscriber count as JSON
-});
+
+    // Log analytics event
+    console.log(`Subscriber count served: ${subscriberCount}`);
+    
+    // Send the subscriber count as JSON
+    res.json({ subscriberCount });
+}));
 
 // Start the Express server on the defined port
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
-
-
-
-
-
-
