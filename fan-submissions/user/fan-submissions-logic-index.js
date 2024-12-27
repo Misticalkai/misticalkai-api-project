@@ -33,8 +33,21 @@ const storage = multer.diskStorage({
   }
 });
 
-// Initialize multer for file uploads
-const upload = multer({ storage: storage });
+// File filter to restrict allowed file types
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ['image/png', 'image/jpeg', 'image/gif']; // Allowed mime types
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true); // Accept the file
+  } else {
+    cb(new Error('Invalid file type. Only .png, .jpeg, and .gif are allowed.'), false); // Reject the file
+  }
+};
+
+// Initialize multer with file filter
+const upload = multer({ 
+  storage: storage,
+  fileFilter: fileFilter // Apply the file filter
+});
 
 // Set up PostgreSQL client
 const client = new Client({
