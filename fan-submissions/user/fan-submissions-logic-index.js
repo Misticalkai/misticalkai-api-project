@@ -47,7 +47,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: process.env.CLOUDFLARE_R2_BUCKET,  // R2 Bucket name
+    bucket: 'fan-art-submissions-storage',  // Correct bucket name here
     acl: 'public-read',  // Set the access control to public read
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: (req, file, cb) => {
