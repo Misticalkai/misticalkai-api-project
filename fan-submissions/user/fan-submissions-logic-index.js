@@ -1,10 +1,11 @@
-// fan-submissions-logic-index.js
 const express = require('express');
 const multer = require('multer');
 const { Client } = require('pg'); // PostgreSQL client
 const dotenv = require('dotenv');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const AWS = require('aws-sdk'); // AWS SDK for Cloudflare R2
+const multerS3 = require('multer-s3'); // Multer S3 storage engine
 
 // Load environment variables from .env file
 dotenv.config();
@@ -15,7 +16,7 @@ const app = express();
 // CORS configuration
 const corsOptions = {
   origin: 'https://misticalkai.com', // Allow only requests from this domain
-  methods: ['GET', 'POST'],         // Allow GET and POST requests
+  methods: ['POST'],                // Allow only POST requests
   allowedHeaders: ['Content-Type'],  // Allow only the content-type header
 };
 
@@ -23,18 +24,39 @@ const corsOptions = {
 app.use(cors(corsOptions));          // Apply the CORS configuration
 app.use(bodyParser.json());
 
-// Configure file storage for multer (handle image uploads)
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Directory where files will be stored
-  },
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname); // File naming convention
-  }
+// Set up AWS SDK for Cloudflare R2
+const s3 = new AWS.S3({
+  endpoint: process.env.CLOUDFLARE_R2_ENDPOINT,  // R2 endpoint
+  accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID, // R2 Access Key
+  secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY, // R2 Secret Key
+  region: 'auto', // Region for R2
+  signatureVersion: 'v4',
 });
 
-// Initialize multer for file uploads
-const upload = multer({ storage: storage });
+// File filter to restrict allowed file types
+const fileFilter = (req, file, cb) => {
+  const allowedTypes = ['image/png', 'image/jpeg', 'image/gif']; // Allowed mime types
+  if (allowedTypes.includes(file.mimetype)) {
+    cb(null, true); // Accept the file
+  } else {
+    cb(new Error('Invalid file type. Only .png, .jpeg, and .gif are allowed.'), false); // Reject the file
+  }
+};
+
+// Set up multer with Cloudflare R2 storage
+const upload = multer({
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.CLOUDFLARE_R2_BUCKET,  // R2 Bucket name
+    acl: 'public-read',  // Set the access control to public read
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: (req, file, cb) => {
+      const filename = Date.now() + '-' + file.originalname;
+      cb(null, filename); // Set the file name in R2
+    }
+  }),
+  fileFilter: fileFilter, // Apply the file filter
+});
 
 // Set up PostgreSQL client
 const client = new Client({
@@ -49,7 +71,10 @@ client.connect()
 app.post('/v1/user/view-form/submit-fan-mail', upload.single('fanArt'), async (req, res) => {
   try {
     const { name, email, message } = req.body;
-    const file = req.file ? req.file.path : null;
+    const file = req.file ? req.file.location : null; // R2 stores the file location in `req.file.location`
+
+    // Log the submission data (for debugging)
+    console.log('Received fan submission:', { name, email, message, file });
 
     // Insert fan submission into the PostgreSQL database
     const query = 'INSERT INTO fan_submissions(name, email, message, file) VALUES($1, $2, $3, $4) RETURNING *';

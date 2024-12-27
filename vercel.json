@@ -2,32 +2,33 @@
   "version": 2,
   "builds": [
     {
-      "src": "stats/youtube/stats-logic-index.js",
+      "src": "stats/youtube/stats-logic-index.js",  // Serverless function for YouTube stats
       "use": "@vercel/node"
     },
     {
-      "src": "fan-submissions/user/fan-submissions-logic-index.js",
+      "src": "fan-submissions/user/fan-submissions-logic-index.js",  // Serverless function for fan submissions (user)
       "use": "@vercel/node"
     },
     {
-      "src": "fan-submissions/admin/fan-submissions-admin-logic-index.js",
+      "src": "fan-submissions/admin/fan-submissions-admin-logic-index.js",  // Serverless function for fan submissions (admin)
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
-      "src": "/v1/user/view-form/submit-fan-mail",
+      "src": "/v1/user/view-form/submit-fan-mail",  // Endpoint for fan submission (user)
       "dest": "fan-submissions/user/fan-submissions-logic-index.js"
     },
     {
-      "src": "/v1/admin/view-form/fan-submissions",
+      "src": "/v1/admin/view-form/fan-submissions",  // Endpoint for admin to view submissions
       "dest": "fan-submissions/admin/fan-submissions-admin-logic-index.js"
     },
     {
-      "src": "/v1/stats/youtube/live-sub-count",
+      "src": "/v1/stats/youtube/live-sub-count",  // Endpoint for YouTube live sub count stats
       "dest": "stats/youtube/stats-logic-index.js"
     }
   ]
 }
+
 
 
