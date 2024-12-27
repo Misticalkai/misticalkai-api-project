@@ -7,7 +7,6 @@ const express = require('express');
 const NodeCache = require('node-cache');
 const rateLimit = require('express-rate-limit');
 const cors = require('cors');
-const { withAnalytics } = require('@vercel/analytics'); // Import Vercel Analytics
 
 const app = express();
 const port = 3000;
@@ -73,7 +72,7 @@ async function getLiveSubscriberCount(forceRefresh = false) {
 app.use(express.static('public'));
 
 // Define a route that returns live subscriber count in JSON format
-app.get('/v1/stats/youtube/live-sub-count', withAnalytics(async (req, res) => {
+app.get('/v1/stats/youtube/live-sub-count', async (req, res) => {
     const forceRefresh = req.query.forceRefresh === 'true'; // Check for the 'forceRefresh' query parameter
     const subscriberCount = await getLiveSubscriberCount(forceRefresh);
 
@@ -82,7 +81,7 @@ app.get('/v1/stats/youtube/live-sub-count', withAnalytics(async (req, res) => {
     
     // Send the subscriber count as JSON
     res.json({ subscriberCount });
-}));
+});
 
 // Start the Express server on the defined port
 app.listen(port, () => {
